@@ -8,6 +8,8 @@ permissions:
   contents: write
 jobs:
   deploy:
+    # Skip on forks — SPONSOR_PAT and org sponsors config only exist upstream.
+    if: github.repository == 'Mintplex-Labs/anything-llm'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
