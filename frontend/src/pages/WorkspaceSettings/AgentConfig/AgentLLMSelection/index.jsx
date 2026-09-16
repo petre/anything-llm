@@ -23,6 +23,7 @@ const ENABLED_PROVIDERS = [
   "textgenwebui",
   "generic-openai",
   "bedrock",
+  "vertex",
   "fireworksai",
   "deepseek",
   "ppio",
@@ -37,10 +38,11 @@ const ENABLED_PROVIDERS = [
   "zai",
   "giteeai",
   "cohere",
-  "docker-model-runner",
+  "llmman",
   "privatemode",
   "sambanova",
   "lemonade",
+  "omlx",
   "minimax",
   "cerebras",
 ];
@@ -50,7 +52,7 @@ const WARN_PERFORMANCE = [
   "ollama",
   "localai",
   "textgenwebui",
-  "docker-model-runner",
+  "llmman",
 ];
 
 const LLM_DEFAULT = {

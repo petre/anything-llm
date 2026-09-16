@@ -18,6 +18,7 @@ import KoboldCPPLogo from "@/media/llmprovider/koboldcpp.png";
 import TextGenWebUILogo from "@/media/llmprovider/text-generation-webui.png";
 import LiteLLMLogo from "@/media/llmprovider/litellm.png";
 import AWSBedrockLogo from "@/media/llmprovider/bedrock.png";
+import VertexLogo from "@/media/llmprovider/vertex.png";
 import DeepSeekLogo from "@/media/llmprovider/deepseek.png";
 import APIPieLogo from "@/media/llmprovider/apipie.png";
 import NovitaLogo from "@/media/llmprovider/novita.png";
@@ -29,10 +30,11 @@ import PPIOLogo from "@/media/llmprovider/ppio.png";
 import MoonshotAiLogo from "@/media/llmprovider/moonshotai.png";
 import CometApiLogo from "@/media/llmprovider/cometapi.png";
 import GiteeAILogo from "@/media/llmprovider/giteeai.png";
-import DockerModelRunnerLogo from "@/media/llmprovider/docker-model-runner.png";
+import LlmmanLogo from "@/media/llmprovider/llmman.png";
 import PrivateModeLogo from "@/media/llmprovider/privatemode.png";
 import SambaNovaLogo from "@/media/llmprovider/sambanova.png";
 import LemonadeLogo from "@/media/llmprovider/lemonade.png";
+import OMLXLogo from "@/media/llmprovider/omlx.png";
 import MinimaxLogo from "@/media/llmprovider/minimax.png";
 import CerebrasLogo from "@/media/llmprovider/cerebras.png";
 
@@ -55,6 +57,7 @@ import KoboldCPPOptions from "@/components/LLMSelection/KoboldCPPOptions";
 import TextGenWebUIOptions from "@/components/LLMSelection/TextGenWebUIOptions";
 import LiteLLMOptions from "@/components/LLMSelection/LiteLLMOptions";
 import AWSBedrockLLMOptions from "@/components/LLMSelection/AwsBedrockLLMOptions";
+import VertexLLMOptions from "@/components/LLMSelection/VertexLLMOptions";
 import DeepSeekOptions from "@/components/LLMSelection/DeepSeekOptions";
 import ApiPieLLMOptions from "@/components/LLMSelection/ApiPieOptions";
 import NovitaLLMOptions from "@/components/LLMSelection/NovitaLLMOptions";
@@ -65,10 +68,11 @@ import PPIOLLMOptions from "@/components/LLMSelection/PPIOLLMOptions";
 import MoonshotAiOptions from "@/components/LLMSelection/MoonshotAiOptions";
 import CometApiLLMOptions from "@/components/LLMSelection/CometApiLLMOptions";
 import GiteeAiOptions from "@/components/LLMSelection/GiteeAIOptions";
-import DockerModelRunnerOptions from "@/components/LLMSelection/DockerModelRunnerOptions";
+import LlmmanOptions from "@/components/LLMSelection/LlmmanOptions";
 import PrivateModeOptions from "@/components/LLMSelection/PrivateModeOptions";
 import SambaNovaOptions from "@/components/LLMSelection/SambaNovaOptions";
 import LemonadeOptions from "@/components/LLMSelection/LemonadeOptions";
+import OMLXOptions from "@/components/LLMSelection/OMLXOptions";
 import MinimaxOptions from "@/components/LLMSelection/MinimaxOptions";
 import CerebrasLLMOptions from "@/components/LLMSelection/CerebrasLLMOptions";
 
@@ -132,11 +136,11 @@ const LLMS = [
       "Discover, download, and run thousands of cutting edge LLMs in a few clicks.",
   },
   {
-    name: "Docker Model Runner",
-    value: "docker-model-runner",
-    logo: DockerModelRunnerLogo,
-    options: (settings) => <DockerModelRunnerOptions settings={settings} />,
-    description: "Run LLMs using Docker Model Runner.",
+    name: "llmman",
+    value: "llmman",
+    logo: LlmmanLogo,
+    options: (settings) => <LlmmanOptions settings={settings} />,
+    description: "Run LLMs locally using llmman.",
   },
   {
     name: "Lemonade",
@@ -145,6 +149,13 @@ const LLMS = [
     options: (settings) => <LemonadeOptions settings={settings} />,
     description:
       "Run local LLMs, ASR, TTS, and more in a single unified AI runtime.",
+  },
+  {
+    name: "oMLX",
+    value: "omlx",
+    logo: OMLXLogo,
+    options: (settings) => <OMLXOptions settings={settings} />,
+    description: "Run MLX models on Apple Silicon with smart caching.",
   },
   {
     name: "Local AI",
@@ -277,6 +288,13 @@ const LLMS = [
     logo: AWSBedrockLogo,
     options: (settings) => <AWSBedrockLLMOptions settings={settings} />,
     description: "Run powerful foundation models privately with AWS Bedrock.",
+  },
+  {
+    name: "Google Vertex AI",
+    value: "vertex",
+    logo: VertexLogo,
+    options: (settings) => <VertexLLMOptions settings={settings} />,
+    description: "Run Gemini models through your Google Cloud project.",
   },
   {
     name: "Privatemode",

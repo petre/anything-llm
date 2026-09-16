@@ -8,6 +8,51 @@ import { THREAD_RENAME_EVENT } from "@/components/Sidebar/ActiveWorkspaces/Threa
 export const AGENT_SESSION_START = "agentSessionStart";
 export const AGENT_SESSION_END = "agentSessionEnd";
 
+// Socket events where the agent execution loop has paused and is waiting on
+// the user to respond (feedback prompt, tool approval, clarifying questions).
+// While one of these is pending the UI should show the send button instead of
+// the stop generation button.
+const AGENT_AWAITING_USER_EVENTS = [
+  "WAITING_ON_INPUT",
+  "toolApprovalRequest",
+  "clarificationRequest",
+  // An inline /img command finished while the session was paused awaiting
+  // feedback - it stays paused, so the send button must come back.
+  "imageGenerationCard",
+];
+
+// Bookkeeping events that never indicate the agent is actively working. Some
+// of these can arrive after the execution loop already finished (e.g.
+// rename_thread fires once the async chat save + thread auto-rename complete),
+// so they must not re-show the stop generation button.
+const AGENT_PASSIVE_EVENTS = ["rename_thread"];
+const AGENT_PASSIVE_STREAM_EVENTS = [
+  "chatId",
+  "usageMetrics",
+  "citations",
+  "removeStatusResponse",
+];
+
+/**
+ * Determine what the chat loading state should become for an incoming agent
+ * socket event: `true` while the agent is actively working (stop generation
+ * button shows), `false` when it has paused to wait on the user (send button
+ * shows), and `null` for passive bookkeeping events that should leave the
+ * loading state untouched.
+ * @param {object|null} data - parsed agent socket event payload
+ * @returns {boolean|null}
+ */
+export function agentEventLoadingState(data) {
+  if (AGENT_AWAITING_USER_EVENTS.includes(data?.type)) return false;
+  if (AGENT_PASSIVE_EVENTS.includes(data?.type)) return null;
+  if (
+    data?.type === "reportStreamEvent" &&
+    AGENT_PASSIVE_STREAM_EVENTS.includes(data?.content?.type)
+  )
+    return null;
+  return true;
+}
+
 // Citations arrive as a terminal websocket event that must match an existing message by
 // uuid. On a thread's first message the empty->chat transition remounts the chat and
 // replays the send, so the citations event can land before its message exists in history.
@@ -22,6 +67,8 @@ function takeBufferedCitations(uuid) {
 const handledEvents = [
   "statusResponse",
   "fileDownloadCard",
+  "imageGenerationCard",
+  "imageGenerationPending",
   "scheduledJobCreated",
   "awaitingFeedback",
   "wssFailure",
@@ -81,6 +128,26 @@ export default function handleSocketResponse(socket, event, setChatHistory) {
     if (!data.requestId || !data.skillName) return;
   } else if (data.type === "clarificationRequest") {
     if (!data.requestId || !Array.isArray(data.questions)) return;
+  } else if (data.type === "imageGenerationPending") {
+    // The generate-image skill tags its placeholder with a pendingId and the
+    // prompt so the result card can swap it out by uuid. The inline /img
+    // command sends no content - its empty placeholder is swept up by the
+    // !!msg.content filters when the next message lands.
+    return setChatHistory((prev) => [
+      ...prev.filter((msg) => !!msg.content),
+      {
+        type: "imageGenerationPending",
+        uuid: data.content?.pendingId || v4(),
+        content: data.content?.prompt || "",
+        role: "assistant",
+        sources: [],
+        closed: false,
+        error: null,
+        animate: false,
+        pending: true,
+        metrics: {},
+      },
+    ]);
   } else if (!handledEvents.includes(data.type) || !data.content) {
     return;
   }
@@ -271,6 +338,33 @@ export default function handleSocketResponse(socket, event, setChatHistory) {
     });
   }
 
+  if (data.type === "imageGenerationCard") {
+    return setChatHistory((prev) => {
+      // Drops the placeholder card this result belongs to, if there was one.
+      const history = prev.filter(
+        (msg) => !!msg.content && msg.uuid !== data.content.pendingId
+      );
+      if (data.content.failed) return history;
+      return [
+        ...history,
+        {
+          uuid: v4(),
+          type: "textResponse",
+          content: data.content.text,
+          outputs: data.content.outputs || [],
+          chatId: data.content.chatId || null,
+          role: "assistant",
+          sources: [],
+          closed: true,
+          error: null,
+          animate: false,
+          pending: false,
+          metrics: {},
+        },
+      ];
+    });
+  }
+
   if (data.type === "scheduledJobCreated") {
     return setChatHistory((prev) => {
       return [
@@ -406,6 +500,26 @@ export function setAgentSessionActive(value) {
 }
 export function getAgentSessionActive() {
   return _agentSessionActive;
+}
+
+// Live agent-session websocket, used to toggle tools available to the agent mid-session.
+let _agentSessionSocket = null;
+export function setAgentSessionSocket(socket) {
+  _agentSessionSocket = socket;
+}
+
+/**
+ * Toggle a tool/skill on or off for the active agent session over the websocket.
+ * No-op when there is no open agent session.
+ * @param {string} skill - Skill key, `@@flow_<uuid>`, MCP `<server>-<tool>`, hubId, or sub-skill name.
+ * @param {boolean} enabled - Whether the tool should be enabled.
+ * @param {string|null} [serverName] - MCP server name; required to enable an MCP tool mid-session.
+ */
+export function toggleAgentSessionTool(skill, enabled, serverName = null) {
+  if (_agentSessionSocket?.readyState !== WebSocket.OPEN) return;
+  _agentSessionSocket.send(
+    JSON.stringify({ type: "agentToolToggle", skill, enabled, serverName })
+  );
 }
 
 export function useIsAgentSessionActive() {

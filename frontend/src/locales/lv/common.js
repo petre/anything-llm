@@ -110,6 +110,7 @@ const TRANSLATIONS = {
     },
     "scheduled-jobs": "Plānotas darba uzdevumi",
     "model-router": "Modeļa routers",
+    "image-generation": "Attēlu ģenerēšana",
   },
   login: {
     "multi-user": {
@@ -199,7 +200,7 @@ const TRANSLATIONS = {
       query: {
         title: "Vaicājums",
         description:
-          'sniedz atbildes <b>tikai__, </b>ja dokumenta konteksts ir atrasts.<br />Lai izmantotu rīkus, jums būs jāizmanto komanda "@agent".',
+          'sniedz atbildes <b>tikai, </b>ja dokumenta konteksts ir atrasts.<br />Lai izmantotu rīkus, jums būs jāizmanto komanda "@agent".',
       },
       automatic: {
         description:
@@ -321,8 +322,6 @@ const TRANSLATIONS = {
         description:
           "Ļauj savam pārstāvim izmantot SQL, lai atbildētu uz jūsu jautājumiem, savienojoties ar dažādiem SQL datubāzes sniedzējiem.",
       },
-      default_skill:
-        "Par iestatījumu, šī spēja ir aktivizēta, taču jūs varat to izslēgt, ja nevēlaties, lai tā būtu pieejama aģentam.",
       filesystem: {
         title: "Failu sistēmas piekļuves tiesības",
         description:
@@ -728,6 +727,11 @@ const TRANSLATIONS = {
         description:
           'Ļauj aģentam izveidot atkārtotus plānotus darbus no čata (piemēram, "katru darba dienu plkst. 9:00 nosūtīt man savu e-pasta kopsavilkumu un nosūtīt ziņu"). Pieejams tikai vienam lietotājam.',
       },
+      generateImage: {
+        title: "Izveidot attēlus",
+        description:
+          "Ļauj aģentam ģenerēt attēlus no sarunas, vai rediģēt attēlus, kas pievienoti sarunai, izmantojot konfigurētu attēlu ģenerēšanas pakalpojumu.",
+      },
     },
     mcp: {
       title: "MCP serveri",
@@ -877,6 +881,11 @@ const TRANSLATIONS = {
         title: "Izveidot HTML saturu, ko var izmantot čatā.",
         description:
           "Ievietojiet HTML atbildes palīdzības atbildēs.\nTas var novērst daudz augstāku atbildes kvalitātes līmeni, taču arī var radīt potenciālas drošības riskus.",
+      },
+      "disable-auto-scroll": {
+        title: "Atspējot automātisko skrološanu",
+        description:
+          "Atstāviet automātisko skrološanu uz sarunas beigām, kad saņemts jauns sūtījums.",
       },
     },
   },
@@ -1184,6 +1193,8 @@ const TRANSLATIONS = {
       save_embed: "Saglabāt un iegult",
       "total-documents_one": "{{count}} dokumenta",
       "total-documents_other": "{{count}} dokumenti",
+      "search-results_one": "Rezultāts {{count}}",
+      "search-results_other": "Rezultāti {{count}}",
     },
     upload: {
       "processor-offline": "Dokumentu apstrādātājs nav pieejams",
@@ -1221,6 +1232,33 @@ const TRANSLATIONS = {
       watch_explained_block3_link: "Failu pārvaldnieka",
       watch_explained_block3_end: " administratora skata.",
       accept: "Labi, sapratu",
+    },
+    gitea: {
+      name: "Gitea Repo",
+      description:
+        "Ievietojiet visu publisko vai privāto repozitāru no jebkuras Gitea instancē vienā darbībā.",
+      URL: "Gitea repozitorija URL",
+      URL_explained:
+        "Veidotā repozitāra URL, ko vēlaties izveidot savā Gitea instancē – atbalstītas arī pašnomājās instalācijas.",
+      token: "Gitea piekļuves atslēga",
+      optional: "pēc izvēles",
+      token_explained:
+        "Nepieciešams piekļuves tokens, lai iegūtu privātus repozitārus vai repozitārus, kas atrodas serveros, kur nepieciešama autentifikācija.",
+      token_explained_start: "Bez",
+      token_explained_link1: "Piekļuves tokens",
+      token_explained_end:
+        "Tikai tie repozitāri, kas ir pieejami jūsu Gitea instalācijas izmantošanai, var tikt apkopoti.",
+      ignores: "Faila ignorēšana",
+      git_ignore:
+        "Saraksts formātā `.gitignore`, kas paredzēts, lai ignorētu specifiskus failus, kad tiek veikta kolekcija. Nospiediet Enter pēc katra ieraksta, ko vēlaties saglabāt.",
+      task_explained:
+        "Kad visi faili būs saglabāti, tie būs pieejami, lai tos varētu ievietot darba vietās dokumentu izvēlēšanās funkcijā.",
+      branch: "Pasta mape, no kuras vēlaties izveidot kopijas.",
+      branch_loading: "— Pārbaudes pieejamos veidus —",
+      branch_explained:
+        "Pasta darbvietu, no kuras vēlaties lejupielādēt failus.",
+      token_information:
+        "Bez aizpildot <b>Gitea piekļuves atslēgu</b>, šis datu savienojums varēs vēlēt tikai failus no repozitāriem, kas ir <b>atvērti un pieejami</b> jūsu Gitea instancē.",
     },
   },
   chat_window: {
@@ -1366,6 +1404,19 @@ const TRANSLATIONS = {
     stt_transcription_failed: "Transkripcija neizdevās: {{error}}",
     export: "Eksportēt čatu kā...",
     exporting: "Eksporteris…",
+    preset_img_description: "Izveidot attēlu no teksta norādījuma",
+    generating_response: "Atbildes izveide",
+    response_failed: "Neizdevās atbildēt uz ziņojumu.",
+    response_failed_reason: "Iemesls: {{reason}}",
+    thought_in_progress: "Modeļim ir domas...",
+    thoughts: "Domas",
+    leave_generating: {
+      title: "Kas ir novērst atbildes generēšanu?",
+      description:
+        "Jūs gatavojaties iziet no šīs sarunas, un tas apturēs modeli, kas varētu atbildēt, un šo nevarēs atkāties.",
+      cancel: "Atcelt",
+      confirm: "Turpināt",
+    },
   },
   profile_settings: {
     edit_account: "Rediģēt kontu",
@@ -1926,6 +1977,24 @@ const TRANSLATIONS = {
       "routed-to": "Sūtīts uz <route>{{model}}</route>",
       "routed-to-rule":
         "Aizvedēts pa <route>{{model}}</route> ceļu, izmantojot <rule>{{ruleTitle}}</rule>",
+    },
+  },
+  imageGeneration: {
+    title: "Attēla veidošanas preferences",
+    description:
+      "Iestatiet pakalpojumu, ko izmanto attēlu ģenerēšanai no `/img` komandas.",
+    provider: "Attēlu ģenerēšanas pakalpojumu sniedzējs",
+    card: {
+      "failed-to-load": "Attēlam izdevās neizveidoties",
+      "alt-text": "Sintetizēts attēls",
+      edit: "Rediģēt",
+      download: "Lejupielādēt",
+    },
+    pending: {
+      heading: "Ierakstiet savu attēlu...",
+      description:
+        "Tam varbūt būs nepieciešams laiks. Tas tiks publicēts šeit, kad tas būs gatavs.",
+      aborted: "Attēla izveide tika pārtraukta.",
     },
   },
 };

@@ -112,19 +112,25 @@ class EphemeralAgentHandler extends AgentHandler {
         )
       ).reverse();
 
+      const { generatedImageAttachments } = require("../files");
       const agentHistory = [];
       rawHistory.forEach((chatLog) => {
+        const response = safeJsonParse(chatLog.response, {});
+        // Re-read generated images off disk as attachments so they reach the
+        // agent as vision context, the same way they do in normal chat.
+        const attachments = generatedImageAttachments(response?.outputs);
         agentHistory.push(
           {
             from: USER_AGENT.name,
             to: WORKSPACE_AGENT.name,
             content: chatLog.prompt,
             state: "success",
+            ...(attachments.length > 0 ? { attachments } : {}),
           },
           {
             from: WORKSPACE_AGENT.name,
             to: USER_AGENT.name,
-            content: safeJsonParse(chatLog.response)?.text || "",
+            content: response?.text || "",
             state: "success",
           }
         );
@@ -254,6 +260,10 @@ class EphemeralAgentHandler extends AgentHandler {
     this.provider = router.resolvedRoute.provider;
     this.model = router.resolvedRoute.model;
     this.routingMetadata = router.routingMetadata;
+    // Held so the model-router-cooldown plugin can restart the cooldown when
+    // the agent stops responding. Routing re-resolves per turn, so this always
+    // points at the router for the current route.
+    this._modelRouter = router;
   }
 
   async #attachPlugins(args) {
@@ -542,6 +552,15 @@ class EphemeralAgentHandler extends AgentHandler {
           return null;
         }
       };
+
+      this.log(
+        `Attached ${AgentPlugins.modelRouterCooldown.name} plugin to Agent cluster`
+      );
+      this.aibitat.use(
+        AgentPlugins.modelRouterCooldown.plugin(() =>
+          this._modelRouter?.onInferenceComplete()
+        )
+      );
     }
 
     // Attach HTTP response object if defined for chunk streaming.
@@ -668,6 +687,11 @@ class EphemeralEventListener extends EventEmitter {
         continue;
       }
 
+      // Generated images are collected from the agent's pending outputs, so the
+      // live card event is not a text response and is ignored here.
+      if (["imageGenerationCard", "imageGenerationPending"].includes(msg.type))
+        continue;
+
       if (msg.type === "reportStreamEvent") {
         const inner = msg.content;
         if (inner?.type === "textResponseChunk" && inner?.content)
@@ -731,6 +755,11 @@ class EphemeralEventListener extends EventEmitter {
           error: null,
         });
       }
+
+      // Generated images travel back in the final response `outputs`, so the
+      // live card event has nothing to stream.
+      if (["imageGenerationCard", "imageGenerationPending"].includes(data.type))
+        return;
 
       if (data.type === "reportStreamEvent") {
         const inner = data.content;

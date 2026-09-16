@@ -445,6 +445,55 @@ export function DuckDuckGoOptions() {
   );
 }
 
+export function KeenableSearchOptions({ settings }) {
+  return (
+    <>
+      <p className="text-sm text-white/60 my-2">
+        Keenable works without an API key required. To lift rate limits, add an
+        API key{" "}
+        <a
+          href="https://keenable.ai/console"
+          target="_blank"
+          rel="noreferrer"
+          className="text-blue-300 underline"
+        >
+          from Keenable.
+        </a>
+      </p>
+      <div className="flex gap-x-4">
+        <div className="flex flex-col w-60">
+          <label className="text-white text-sm font-semibold block mb-3">
+            API Key (optional)
+          </label>
+          <input
+            type="password"
+            name="env::AgentKeenableApiKey"
+            className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
+            placeholder="Keenable API Key"
+            defaultValue={settings?.AgentKeenableApiKey ? "*".repeat(20) : ""}
+            autoComplete="off"
+            spellCheck={false}
+          />
+        </div>
+        <div className="flex flex-col w-60">
+          <label className="text-white text-sm font-semibold block mb-3">
+            Base URL (optional)
+          </label>
+          <input
+            type="url"
+            name="env::AgentKeenableApiUrl"
+            className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
+            placeholder="https://api.keenable.ai"
+            defaultValue={settings?.AgentKeenableApiUrl}
+            autoComplete="off"
+            spellCheck={false}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
 export function ExaSearchOptions({ settings }) {
   return (
     <>
@@ -541,6 +590,43 @@ export function BraveSearchOptions({ settings }) {
             placeholder="Brave API Key"
             defaultValue={settings?.AgentBraveApiKey ? "*".repeat(20) : ""}
             required={true}
+            autoComplete="off"
+            spellCheck={false}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+export function YouSearchOptions({ settings }) {
+  return (
+    <>
+      <p className="text-sm text-white/60 my-2">
+        You.com works without an API key (free tier, IP rate-limited). For
+        higher limits, get an API key{" "}
+        <a
+          href="https://you.com/platform"
+          target="_blank"
+          rel="noreferrer"
+          className="text-blue-300 underline"
+        >
+          from You.com
+        </a>
+        .
+      </p>
+      <div className="flex gap-x-4">
+        <div className="flex flex-col w-60">
+          <label className="text-white text-sm font-semibold block mb-3">
+            API Key (optional)
+          </label>
+          <input
+            type="password"
+            name="env::AgentYouApiKey"
+            className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
+            placeholder="You.com API Key"
+            defaultValue={settings?.AgentYouApiKey ? "*".repeat(20) : ""}
+            required={false}
             autoComplete="off"
             spellCheck={false}
           />

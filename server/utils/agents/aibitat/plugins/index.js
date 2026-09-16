@@ -5,6 +5,7 @@ const { docSummarizer } = require("./summarize.js");
 const { chatHistory } = require("./chat-history.js");
 const { memory } = require("./memory.js");
 const { rechart } = require("./rechart.js");
+const { generateImage } = require("./generate-image.js");
 const { sqlAgent } = require("./sql-agent/index.js");
 const { filesystemAgent } = require("./filesystem/index.js");
 const { createFilesAgent } = require("./create-files/index.js");
@@ -13,6 +14,7 @@ const { outlookAgent } = require("./outlook/index.js");
 const { googleCalendarAgent } = require("./google-calendar/index.js");
 const { requestUserInput } = require("./request-user-input.js");
 const { createScheduledJob } = require("./create-scheduled-job/index.js");
+const { modelRouterCooldown } = require("./model-router-cooldown.js");
 
 module.exports = {
   webScraping,
@@ -22,6 +24,7 @@ module.exports = {
   chatHistory,
   memory,
   rechart,
+  generateImage,
   sqlAgent,
   filesystemAgent,
   createFilesAgent,
@@ -30,6 +33,7 @@ module.exports = {
   googleCalendarAgent,
   requestUserInput,
   createScheduledJob,
+  modelRouterCooldown,
 
   // Plugin name aliases so they can be pulled by slug as well.
   [webScraping.name]: webScraping,
@@ -39,6 +43,7 @@ module.exports = {
   [chatHistory.name]: chatHistory,
   [memory.name]: memory,
   [rechart.name]: rechart,
+  [generateImage.name]: generateImage,
   [sqlAgent.name]: sqlAgent,
   [filesystemAgent.name]: filesystemAgent,
   [createFilesAgent.name]: createFilesAgent,
@@ -47,4 +52,5 @@ module.exports = {
   [googleCalendarAgent.name]: googleCalendarAgent,
   [requestUserInput.name]: requestUserInput,
   [createScheduledJob.name]: createScheduledJob,
+  [modelRouterCooldown.name]: modelRouterCooldown,
 };

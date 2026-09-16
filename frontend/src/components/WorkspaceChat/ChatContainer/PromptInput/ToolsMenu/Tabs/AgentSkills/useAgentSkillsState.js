@@ -6,6 +6,7 @@ import AgentFlows from "@/models/agentFlows";
 import MCPServers from "@/models/mcpServers";
 import { getSubSkillPreferenceKeys } from "./skillRegistry";
 import useSubSkillPreferences from "./useSubSkillPreferences";
+import { toggleAgentSessionTool } from "@/utils/chat/agent";
 
 /**
  * Core hook for managing all agent skill state.
@@ -14,6 +15,8 @@ import useSubSkillPreferences from "./useSubSkillPreferences";
 export default function useAgentSkillsState(defaultSkills) {
   // Core skill state
   const [fileSystemAgentAvailable, setFileSystemAgentAvailable] =
+    useState(false);
+  const [imageGenerationAvailable, setImageGenerationAvailable] =
     useState(false);
   const [isMultiUser, setIsMultiUser] = useState(false);
   const [disabledDefaults, setDisabledDefaults] = useState([]);
@@ -36,18 +39,24 @@ export default function useAgentSkillsState(defaultSkills) {
   async function fetchSkillSettings() {
     try {
       const subSkillPrefKeys = getSubSkillPreferenceKeys();
-      const [prefs, flowsRes, fsAgentAvailable, multiUserMode] =
-        await Promise.all([
-          Admin.systemPreferencesByFields([
-            "disabled_agent_skills",
-            "default_agent_skills",
-            "imported_agent_skills",
-            ...subSkillPrefKeys,
-          ]),
-          AgentFlows.listFlows(),
-          System.isFileSystemAgentAvailable(),
-          System.isMultiUserMode(),
-        ]);
+      const [
+        prefs,
+        flowsRes,
+        fsAgentAvailable,
+        multiUserMode,
+        imageGenAvailable,
+      ] = await Promise.all([
+        Admin.systemPreferencesByFields([
+          "disabled_agent_skills",
+          "default_agent_skills",
+          "imported_agent_skills",
+          ...subSkillPrefKeys,
+        ]),
+        AgentFlows.listFlows(),
+        System.isFileSystemAgentAvailable(),
+        System.isMultiUserMode(),
+        System.isImageGenerationAvailable(),
+      ]);
 
       if (prefs?.settings) {
         setDisabledDefaults(prefs.settings.disabled_agent_skills ?? []);
@@ -57,6 +66,7 @@ export default function useAgentSkillsState(defaultSkills) {
       }
       if (flowsRes?.flows) setFlows(flowsRes.flows);
       setFileSystemAgentAvailable(fsAgentAvailable);
+      setImageGenerationAvailable(imageGenAvailable);
       setIsMultiUser(!!multiUserMode);
     } catch (e) {
       console.error(e);
@@ -91,6 +101,7 @@ export default function useAgentSkillsState(defaultSkills) {
     async (key) => {
       const toggleItem = (arr, item) =>
         arr.includes(item) ? arr.filter((s) => s !== item) : [...arr, item];
+      const newEnabled = !isSkillEnabled(key);
 
       if (key in defaultSkills) {
         const updated = toggleItem(disabledDefaults, key);
@@ -99,6 +110,7 @@ export default function useAgentSkillsState(defaultSkills) {
           disabled_agent_skills: updated.join(","),
           default_agent_skills: enabledConfigurable.join(","),
         });
+        toggleAgentSessionTool(key, newEnabled);
         return;
       }
 
@@ -108,8 +120,9 @@ export default function useAgentSkillsState(defaultSkills) {
         disabled_agent_skills: disabledDefaults.join(","),
         default_agent_skills: updated.join(","),
       });
+      toggleAgentSessionTool(key, newEnabled);
     },
-    [defaultSkills, disabledDefaults, enabledConfigurable]
+    [defaultSkills, disabledDefaults, enabledConfigurable, isSkillEnabled]
   );
 
   const toggleImportedSkill = useCallback(async (skill) => {
@@ -120,6 +133,7 @@ export default function useAgentSkillsState(defaultSkills) {
       )
     );
     await AgentPlugins.toggleFeature(skill.hubId, newActive);
+    toggleAgentSessionTool(skill.hubId, newActive);
   }, []);
 
   const toggleFlow = useCallback(async (flow) => {
@@ -128,6 +142,7 @@ export default function useAgentSkillsState(defaultSkills) {
       prev.map((f) => (f.uuid === flow.uuid ? { ...f, active: newActive } : f))
     );
     await AgentFlows.toggleFlow(flow.uuid, newActive);
+    toggleAgentSessionTool(`@@flow_${flow.uuid}`, newActive);
   }, []);
 
   const toggleMcpTool = useCallback(
@@ -154,6 +169,11 @@ export default function useAgentSkillsState(defaultSkills) {
         });
       });
       await MCPServers.toggleTool(serverName, toolName, newEnabled);
+      toggleAgentSessionTool(
+        `${serverName}-${toolName}`,
+        newEnabled,
+        serverName
+      );
     },
     []
   );
@@ -161,6 +181,7 @@ export default function useAgentSkillsState(defaultSkills) {
   return {
     // State
     fileSystemAgentAvailable,
+    imageGenerationAvailable,
     isMultiUser,
     disabledDefaults,
     enabledConfigurable,

@@ -89,6 +89,7 @@ const TRANSLATIONS = {
     transcription: "Transcription",
     embedder: "Embedder",
     "text-splitting": "Text Splitter & Chunking",
+    "image-generation": "Image Generation",
     "voice-speech": "Voice & Speech",
     "vector-database": "Vector Database",
     embeds: "Chat Embed",
@@ -318,6 +319,11 @@ const TRANSLATIONS = {
         title: "Generate charts",
         description:
           "Enable the default agent to generate various types of charts from data provided or given in chat.",
+      },
+      generateImage: {
+        title: "Generate images",
+        description:
+          "Allow the agent to generate images from chat, or edit images attached to the conversation, using your configured image generation provider.",
       },
       web: {
         title: "Web Search",
@@ -715,8 +721,6 @@ const TRANSLATIONS = {
           },
         },
       },
-      default_skill:
-        "By default, this skill is enabled, but you can disable it if you don't want it to be available to the agent.",
     },
     mcp: {
       title: "MCP Servers",
@@ -817,6 +821,11 @@ const TRANSLATIONS = {
       "show-scrollbar": {
         title: "Show Scrollbar",
         description: "Enable or disable the scrollbar in the chat window.",
+      },
+      "disable-auto-scroll": {
+        title: "Disable Auto-Scroll",
+        description:
+          "Disable automatic scrolling to the bottom of the chat when new messages are received.",
       },
       "support-email": {
         title: "Support Email",
@@ -1124,6 +1133,24 @@ const TRANSLATIONS = {
       title: "Embedding Provider",
     },
   },
+  imageGeneration: {
+    title: "Image Generation Preference",
+    description:
+      "Configure the provider used to generate images from the /img chat command.",
+    provider: "Image Generation Provider",
+    card: {
+      "failed-to-load": "Image failed to load",
+      "alt-text": "Generated image",
+      edit: "Edit",
+      download: "Download",
+    },
+    pending: {
+      heading: "Generating your image…",
+      description:
+        "This can take a little while. It'll appear here as soon as it's ready.",
+      aborted: "Image generation was aborted",
+    },
+  },
   text: {
     title: "Text splitting & Chunking Preferences",
     "desc-start":
@@ -1350,6 +1377,32 @@ const TRANSLATIONS = {
       token_personal:
         "Get a free Personal Access Token with a GitLab account here.",
     },
+    gitea: {
+      name: "Gitea Repo",
+      description:
+        "Import an entire public or private repository from any Gitea instance in a single click.",
+      URL: "Gitea Repo URL",
+      URL_explained:
+        "Url of the repo you wish to collect on your Gitea instance - self-hosted instances are supported.",
+      token: "Gitea Access Token",
+      optional: "optional",
+      token_explained:
+        "Access Token required to collect private repositories or repos on instances that require authentication.",
+      token_explained_start: "Without an ",
+      token_explained_link1: "Access Token",
+      token_explained_end:
+        ", only repositories that your Gitea instance exposes publicly can be collected.",
+      ignores: "File Ignores",
+      git_ignore:
+        "List in .gitignore format to ignore specific files during collection. Press enter after each entry you want to save.",
+      task_explained:
+        "Once complete, all files will be available for embedding into workspaces in the document picker.",
+      branch: "Branch you wish to collect files from.",
+      branch_loading: "-- loading available branches --",
+      branch_explained: "Branch you wish to collect files from.",
+      token_information:
+        "Without filling out the <b>Gitea Access Token</b> this data connector will only be able to collect files from repositories that are <b>publicly readable</b> on your Gitea instance.",
+    },
     youtube: {
       name: "YouTube Transcript",
       description:
@@ -1419,6 +1472,8 @@ const TRANSLATIONS = {
       "new-folder": "New Folder",
       "total-documents_one": "{{count}} document",
       "total-documents_other": "{{count}} documents",
+      "search-results_one": "{{count}} result",
+      "search-results_other": "{{count}} results",
       "search-document": "Search for document",
       "no-documents": "No Documents",
       "move-workspace": "Move to Workspace",
@@ -1472,6 +1527,11 @@ const TRANSLATIONS = {
   },
   chat_window: {
     attachments_processing: "Attachments are processing. Please wait...",
+    generating_response: "Generating response",
+    thought_in_progress: "Model is Thinking...",
+    thoughts: "Thoughts",
+    response_failed: "Could not respond to message.",
+    response_failed_reason: "Reason: {{reason}}",
     send_message: "Send a message",
     attach_file: "Attach a file to this chat",
     text_size: "Change text size.",
@@ -1507,6 +1567,7 @@ const TRANSLATIONS = {
     see_less: "See Less",
     see_more: "See More",
     preset_reset_description: "Clear your chat history and begin a new chat",
+    preset_img_description: "Generate an image from a text prompt",
     add_new_preset: " Add New Preset",
     add_new: "Add new",
     edit: "Edit",
@@ -1607,6 +1668,13 @@ const TRANSLATIONS = {
         save: "Save",
         cancel: "Cancel",
       },
+    },
+    leave_generating: {
+      title: "Stop generating response?",
+      description:
+        "You are about to leave this chat, this will stop the model from generating the response and it cannot be recovered.",
+      cancel: "Cancel",
+      confirm: "Continue",
     },
   },
   profile_settings: {
